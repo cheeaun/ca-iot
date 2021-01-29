@@ -1,0 +1,9 @@
+{
+  "name": "ca-iot",
+  "version": "1.0.0",
+  "author": "Lim Chee Aun",
+  "license": "ISC",
+  "dependencies": {
+    "ewelink-api": "~3.1.1"
+  }
+}
