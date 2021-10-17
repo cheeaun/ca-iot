@@ -88,6 +88,9 @@ const fetchAC = async (path, query = {}) => {
       Authorization: `Bearer ${accessToken}`,
     },
     searchParams: query,
+    timeout: {
+      request: 3000,
+    },
   }).json();
 };
 
