@@ -4,6 +4,7 @@
   "author": "Lim Chee Aun",
   "license": "ISC",
   "dependencies": {
+    "@vercel/kv": "~0.2.2",
     "dotenv": "~10.0.0",
     "ewelink-api": "~3.1.1",
     "form-data": "~4.0.0",

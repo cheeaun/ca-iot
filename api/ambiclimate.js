@@ -2,6 +2,7 @@ const got = require('got');
 const FormData = require('form-data');
 const { CookieJar } = require('tough-cookie');
 const cookieJar = new CookieJar();
+const { kv } = require('@vercel/kv');
 
 const {
   AMBICLIMATE_CLIENT_ID,
@@ -16,6 +17,12 @@ const httpbinURL = 'https://httpbin.org/get';
 let ACCESS_TOKEN;
 const getAccessToken = async () => {
   if (ACCESS_TOKEN) return ACCESS_TOKEN;
+  const accessTokenKV = await kv.get('ACCESS_TOKEN');
+  if (accessTokenKV) {
+    ACCESS_TOKEN = accessTokenKV;
+    return accessTokenKV;
+  }
+
   const authURL = `https://api.ambiclimate.com/oauth2/authorize?client_id=${AMBICLIMATE_CLIENT_ID}&redirect_uri=${encodeURIComponent(
     httpbinURL,
   )}&response_type=code`;
@@ -66,6 +73,7 @@ const getAccessToken = async () => {
       const { access_token } = response;
       if (access_token) {
         ACCESS_TOKEN = access_token;
+        kv.set('ACCESS_TOKEN', access_token);
         return access_token;
       } else {
         throw new Error('No access token');

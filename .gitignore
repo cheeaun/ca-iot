@@ -1,4 +1,5 @@
 .env
+.env.development.local
 node_modules
 .vercel
 test*
