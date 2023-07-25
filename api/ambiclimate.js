@@ -124,7 +124,15 @@ module.exports = async (req, res) => {
   if (command === 'toggle') {
     console.log(`🗡️ Command: ${command}`);
     try {
-      const data = await fetchAC('device/appliance_states');
+      let data;
+      try {
+        data = await fetchAC('device/appliance_states');
+      } catch (e) {
+        if (e.response.statusCode === 401) {
+          await kv.delete('ACCESS_TOKEN');
+          data = await fetchAC('device/appliance_states');
+        }
+      }
       let power = 'on';
       if (data.data[0].power === 'On') {
         await fetchAC('device/power/off');
