@@ -1,5 +1,5 @@
-const eWeLink = require('ewelink-api-next');
-const { kv } = require('@vercel/kv');
+import eWeLink from 'ewelink-api-next';
+import { kv } from '@vercel/kv';
 
 const {
   EWELINK_EMAIL,
