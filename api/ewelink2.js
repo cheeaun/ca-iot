@@ -1,4 +1,4 @@
-import eWeLink from 'ewelink-api-next';
+import eWeLink from 'ewelink-api-next2';
 import { kv } from '@vercel/kv';
 
 const {
