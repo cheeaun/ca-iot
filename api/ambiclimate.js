@@ -90,16 +90,27 @@ const fetchAC = async (path, query = {}) => {
   const accessToken = await getAccessToken();
   const apiURL = `https://api.ambiclimate.com/api/v1/${path}`;
   console.log(`↗️ ${apiURL}`);
-  return got(apiURL, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    searchParams: query,
-    timeout: {
-      request: 3000,
-    },
-  }).json();
+  let response;
+  try {
+    response = await got(apiURL, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      searchParams: query,
+      timeout: {
+        request: 3000,
+      },
+    }).json();
+  } catch (error) {
+    if (/401/.test(error.message)) {
+      ACCESS_TOKEN = null;
+      await kv.del('ACCESS_TOKEN');
+      return fetchAC(path, query);
+    }
+    throw error;
+  }
+  return response;
 };
 
 /*
@@ -124,15 +135,7 @@ module.exports = async (req, res) => {
   if (command === 'toggle') {
     console.log(`🗡️ Command: ${command}`);
     try {
-      let data;
-      try {
-        data = await fetchAC('device/appliance_states');
-      } catch (e) {
-        if (e.response.statusCode === 401) {
-          await kv.delete('ACCESS_TOKEN');
-          data = await fetchAC('device/appliance_states');
-        }
-      }
+      const data = await fetchAC('device/appliance_states');
       let power = 'on';
       if (data.data[0].power === 'On') {
         await fetchAC('device/power/off');
