@@ -18,15 +18,15 @@ const client = new eWeLink.WebAPI({
 let ACCESS_TOKEN;
 let REFRESH_TOKEN;
 const redirectUrl = 'https://httpbin.org/get';
-async function initClient() {
-  if (ACCESS_TOKEN && REFRESH_TOKEN) {
+async function initClient(refresh = false) {
+  if (ACCESS_TOKEN && REFRESH_TOKEN && !refresh) {
     client.at = ACCESS_TOKEN;
     client.rt = REFRESH_TOKEN;
     return;
   }
   const accessTokenKV = await kv.get('EWE_ACCESS_TOKEN');
   const refreshTokenKV = await kv.get('EWE_REFRESH_TOKEN');
-  if (accessTokenKV && refreshTokenKV) {
+  if (accessTokenKV && refreshTokenKV && !refresh) {
     ACCESS_TOKEN = accessTokenKV;
     REFRESH_TOKEN = refreshTokenKV;
     client.at = ACCESS_TOKEN;
@@ -103,7 +103,14 @@ module.exports = async (req, res) => {
 
   await initClient();
 
-  const things = await client.device.getAllThings();
+  let things = await client.device.getAllThings();
+
+  if (!things?.data || things.error === 401) {
+    // Re-init client with new token
+    await initClient(true);
+    things = await client.device.getAllThings();
+  }
+
   const thing = things.data.thingList.find(
     (t) => t.itemData.name.toLowerCase() === deviceName.trim().toLowerCase(),
   );
