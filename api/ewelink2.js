@@ -105,7 +105,7 @@ module.exports = async (req, res) => {
 
   let things = await client.device.getAllThings();
 
-  if (!things?.data || things.error === 401) {
+  if (!things?.data?.thingList || things.error === 401) {
     // Re-init client with new token
     await initClient(true);
     things = await client.device.getAllThings();
