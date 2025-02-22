@@ -1,5 +1,10 @@
-import eWeLink from 'ewelink-api-next2';
-import { kv } from '@vercel/kv';
+import eWeLink from 'ewelink-api-next';
+// import { kv } from '@vercel/kv';
+import { Redis } from "@upstash/redis";
+
+// Initialize Redis
+const redis = Redis.fromEnv();
+const kv = redis;
 
 const {
   EWELINK_EMAIL,
